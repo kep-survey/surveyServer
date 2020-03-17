@@ -35,7 +35,29 @@ public class SurveyServerController {
 			e.printStackTrace();
 			
 			JsonObject res = new JsonObject();
-			res.addProperty("result", "FALSE");
+			res.addProperty("result", "false");
+			res.addProperty("msg", "Json processing error occurred");
+			
+			return res.toString();
+		}
+	}
+	
+	@PostMapping("/openSurvey")
+	public String openSurvey(@RequestBody String req) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		
+		try {
+			JsonNode body = objectMapper.readValue(req, JsonNode.class);
+			
+			Long surveyId = body.get("surveyId").asLong();
+			Boolean open = body.get("open").asBoolean();
+			
+			return surveyServerService.openSurvey(surveyId, open);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			
+			JsonObject res = new JsonObject();
+			res.addProperty("result", "false");
 			res.addProperty("msg", "Json processing error occurred");
 			
 			return res.toString();

@@ -26,11 +26,31 @@ public class SurveyServerService {
 			
 			surveysRepository.save(entity);
 			
-			res.addProperty("result", "TRUE");
+			res.addProperty("result", "true");
 			res.addProperty("msg", "Message updated successfully");
 		} catch(Exception e) {
-			res.addProperty("result", "FALSE");
+			res.addProperty("result", "false");
 			res.addProperty("msg", "Message update failed");
+		}
+				
+		return res.toString();
+	}
+	
+	public String openSurvey(Long surveyId, Boolean open) {
+		JsonObject res = new JsonObject();
+		
+		try {
+			Optional<Surveys> survey = surveysRepository.findById(surveyId); 
+			Surveys entity = survey.get();
+			entity.setOpen(open);
+			
+			surveysRepository.save(entity);
+			
+			res.addProperty("result", "true");
+			res.addProperty("msg", "Deployment finished successfully");
+		} catch(Exception e) {
+			res.addProperty("result", "false");
+			res.addProperty("msg", "Deployment failed");
 		}
 				
 		return res.toString();
