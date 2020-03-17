@@ -17,12 +17,11 @@ import javax.persistence.Table;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor(access=AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Getter @Setter
 @Entity
 @Table(name="SURVEYS")
