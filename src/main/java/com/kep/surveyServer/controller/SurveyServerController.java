@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,6 +21,7 @@ public class SurveyServerController {
 	@Autowired
 	private SurveyServerService surveyServerService;
 	
+	/* 설문 배포 :: 설문 환영/완료 메시지 저장 */
 	@PostMapping("/setSurveyInfo")
 	public String setSurveyInfo(@RequestBody String req) {
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -43,6 +45,7 @@ public class SurveyServerController {
 		}
 	}
 	
+	/* 설문 배포 :: 설문 상태 관리 */
 	@PostMapping("/openSurvey")
 	public String openSurvey(@RequestBody String req) {
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -65,8 +68,15 @@ public class SurveyServerController {
 		}
 	}
 	
+	/* 설문 현황 :: 설문 현황 리스트 가져오기 */
 	@GetMapping("/getSurveyStatus")
 	public String getSurveyStatus() {
 		return surveyServerService.getSurveyStatus();
+	}
+	
+	/* 설문 결과 :: 결과 상세 가져오기 */
+	@GetMapping("/getSurveyResult")
+	public String getSurveyResult(@RequestParam Long surveyId) {
+		return surveyServerService.getSurveyResult(surveyId);
 	}
 }

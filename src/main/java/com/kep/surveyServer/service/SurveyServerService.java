@@ -3,13 +3,20 @@ package com.kep.surveyServer.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.aspectj.weaver.patterns.TypePatternQuestions.Question;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.kep.surveyServer.model.Answers;
+import com.kep.surveyServer.model.Options;
+import com.kep.surveyServer.model.Questions;
 import com.kep.surveyServer.model.SurveyHistory;
 import com.kep.surveyServer.model.Surveys;
+import com.kep.surveyServer.repository.AnswersRepository;
+import com.kep.surveyServer.repository.OptionsRepository;
+import com.kep.surveyServer.repository.QuestionsRepository;
 import com.kep.surveyServer.repository.SurveyHistoryRepository;
 import com.kep.surveyServer.repository.SurveysRepository;
 
@@ -19,8 +26,11 @@ public class SurveyServerService {
 	@Autowired
 	private SurveysRepository surveysRepository;
 	private SurveyHistoryRepository surveyHistoryRepository;
+	private QuestionsRepository questionsRepository;
+	private OptionsRepository optionsRepository;
+	private AnswersRepository answersRepository;
 	
-	/* 설문 배포 :: 설문 환영/완료 메시지 저장*/
+	/* 설문 배포 :: 설문 환영/완료 메시지 저장 */
 	public String setSurveyInfo(Long surveyId, String welcomeMsg, String completeMsg) {
 		JsonObject res = new JsonObject();
 		
@@ -86,6 +96,64 @@ public class SurveyServerService {
 		}
 		
 		res.add("statusList", statusList);
+		
+		return res.toString();
+	}
+	
+	/* 설문 결과 :: 결과 상세 가져오기 */
+	public String getSurveyResult(Long surveyId) {
+		JsonObject res = new JsonObject();
+		JsonArray resultList = new JsonArray();
+		
+		List<SurveyHistory> surveyHistoryList = surveyHistoryRepository.findBySurveyHistoryPKSurveyId(surveyId);
+		List<Questions> questionList = questionsRepository.findBySurveyIdOrderBySurveyOrder(surveyId);
+		
+		for (int index = 0; index < surveyHistoryList.size(); index++) {
+			JsonObject result = new JsonObject();
+			JsonArray resultItemList = new JsonArray();
+			JsonArray options = new JsonArray();
+			Questions questionItem = questionList.get(index);
+			
+			String botUserId = surveyHistoryList.get(index).getSurveyHistoryPK().getBotUserId();
+			String questionTitle = questionItem.getDescription();
+			
+			List<Options> optionList = optionsRepository.findByQuestionIdOrderByOptionOrder(questionItem.getId());
+			Answers answer = answersRepository.findByBotUserIdAndQuestionId(botUserId, questionItem.getId());
+			
+			if (questionItem.getType().equals("choice")) {
+				JsonObject resultItem = new JsonObject();
+				
+				for (int second_index = 0; second_index < optionList.size(); second_index++) {
+					JsonObject option = new JsonObject();
+					Options optionItem = optionList.get(second_index);
+					
+					option.addProperty("id", optionItem.getId());
+					option.addProperty("content", optionItem.getOption());
+					
+					options.add(option);
+				}
+				
+				resultItem.addProperty("question", questionTitle);
+				resultItem.add("options", options);
+				resultItem.addProperty("answer", answer.getAnswer());
+				
+				resultItemList.add(resultItem);
+			} else {
+				JsonObject resultItem = new JsonObject();
+				
+				resultItem.addProperty("question", questionTitle);
+				resultItem.addProperty("answer", answer.getAnswer());
+				
+				resultItemList.add(resultItem);
+			}
+			
+			result.addProperty("botUserId", botUserId);
+			result.add("items", resultItemList);
+			
+			resultList.add(result);
+		}
+		
+		res.add("resultList", resultList);
 		
 		return res.toString();
 	}
