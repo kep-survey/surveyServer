@@ -14,6 +14,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import com.kep.surveyServer.service.SurveyServerService;
 
+import lombok.AllArgsConstructor;
+
 @RestController
 @RequestMapping("/api/*")
 public class SurveyServerController {
@@ -70,12 +72,12 @@ public class SurveyServerController {
 	
 	/* 설문 현황 :: 설문 현황 리스트 가져오기 */
 	@GetMapping("/getSurveyStatus")
-	public String getSurveyStatus() {
-		return surveyServerService.getSurveyStatus();
+	public String getSurveyStatus(@RequestParam Long registerId) {
+		return surveyServerService.getSurveyStatus(registerId);
 	}
 	
-	/* 설문 결과 :: 결과 상세 가져오기 */
-	@GetMapping("/getSurveyResult")
+	/* 설문 결과 :: 유저 응답 리스트 가져오기 */
+	@GetMapping("/getSurveyResultList")
 	public String getSurveyResult(@RequestParam Long surveyId) {
 		return surveyServerService.getSurveyResult(surveyId);
 	}

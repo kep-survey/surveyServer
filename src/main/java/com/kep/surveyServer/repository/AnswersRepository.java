@@ -8,6 +8,6 @@ import com.kep.surveyServer.model.Answers;
 @Repository
 public interface AnswersRepository extends JpaRepository<Answers, Long>{
 	
-	Answers findByBotUserIdAndQuestionId(String botUserId, long questionId);
+	Answers findByUsersAndQuestions(String botUserId, long questionId);
 
 }

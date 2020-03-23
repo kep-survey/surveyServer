@@ -3,7 +3,6 @@ package com.kep.surveyServer.service;
 import java.util.List;
 import java.util.Optional;
 
-import org.aspectj.weaver.patterns.TypePatternQuestions.Question;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +18,8 @@ import com.kep.surveyServer.repository.OptionsRepository;
 import com.kep.surveyServer.repository.QuestionsRepository;
 import com.kep.surveyServer.repository.SurveyHistoryRepository;
 import com.kep.surveyServer.repository.SurveysRepository;
+
+import lombok.AllArgsConstructor;
 
 @Service
 public class SurveyServerService {
@@ -74,11 +75,11 @@ public class SurveyServerService {
 	}
 	
 	/* 설문 현황 :: 설문 현황 리스트 가져오기 */
-	public String getSurveyStatus() {
+	public String getSurveyStatus(Long registerId) {
 		JsonObject res = new JsonObject();
 		JsonArray statusList = new JsonArray();
 		
-		List<Surveys> surveys = surveysRepository.findByOpenTrue();
+		List<Surveys> surveys = surveysRepository.findByOpenTrueAndRegisters(registerId);
 		
 		for (int index = 0; index < surveys.size(); index++) {
 			JsonObject item = new JsonObject();
@@ -88,9 +89,9 @@ public class SurveyServerService {
 			
 			item.addProperty("surveyId", survey.getId());
 			item.addProperty("surveyName", survey.getTitle());
-			item.addProperty("responseNum", surveyHistory.size());
-			item.addProperty("surveyStartDate", survey.getStartDatetime().toString());
-			item.addProperty("surveyEndTime", survey.getEndDatetime().toString());
+			item.addProperty("count", surveyHistory.size());
+			item.addProperty("startDate", survey.getStartDatetime().toString());
+			item.addProperty("endTime", survey.getEndDatetime().toString());
 			
 			statusList.add(item);
 		}
@@ -106,7 +107,7 @@ public class SurveyServerService {
 		JsonArray resultList = new JsonArray();
 		
 		List<SurveyHistory> surveyHistoryList = surveyHistoryRepository.findBySurveyHistoryPKSurveyId(surveyId);
-		List<Questions> questionList = questionsRepository.findBySurveyIdOrderBySurveyOrder(surveyId);
+		List<Questions> questionList = questionsRepository.findBySurveysOrderBySurveyOrder(surveyId);
 		
 		for (int index = 0; index < surveyHistoryList.size(); index++) {
 			JsonObject result = new JsonObject();
@@ -117,8 +118,8 @@ public class SurveyServerService {
 			String botUserId = surveyHistoryList.get(index).getSurveyHistoryPK().getBotUserId();
 			String questionTitle = questionItem.getDescription();
 			
-			List<Options> optionList = optionsRepository.findByQuestionIdOrderByOptionOrder(questionItem.getId());
-			Answers answer = answersRepository.findByBotUserIdAndQuestionId(botUserId, questionItem.getId());
+			List<Options> optionList = optionsRepository.findByQuestionsOrderByOptionOrder(questionItem.getId());
+			Answers answer = answersRepository.findByUsersAndQuestions(botUserId, questionItem.getId());
 			
 			if (questionItem.getType().equals("choice")) {
 				JsonObject resultItem = new JsonObject();
