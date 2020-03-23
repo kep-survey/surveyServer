@@ -10,5 +10,5 @@ import com.kep.surveyServer.model.Options;
 @Repository
 public interface OptionsRepository extends JpaRepository<Options, Long>{
 	
-	List<Options> findByQuestionsOrderByOptionOrder(Long questionId);
+	List<Options> findByQuestionsIdOrderByOptionOrder(Long questionId);
 }

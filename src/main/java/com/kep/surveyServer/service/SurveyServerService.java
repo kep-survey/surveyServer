@@ -79,7 +79,7 @@ public class SurveyServerService {
 		JsonObject res = new JsonObject();
 		JsonArray statusList = new JsonArray();
 		
-		List<Surveys> surveys = surveysRepository.findByOpenTrueAndRegisters(registerId);
+		List<Surveys> surveys = surveysRepository.findByOpenTrueAndRegistersId(registerId);
 		
 		for (int index = 0; index < surveys.size(); index++) {
 			JsonObject item = new JsonObject();
@@ -107,7 +107,7 @@ public class SurveyServerService {
 		JsonArray resultList = new JsonArray();
 		
 		List<SurveyHistory> surveyHistoryList = surveyHistoryRepository.findBySurveyHistoryPKSurveyId(surveyId);
-		List<Questions> questionList = questionsRepository.findBySurveysOrderBySurveyOrder(surveyId);
+		List<Questions> questionList = questionsRepository.findBySurveysIdOrderBySurveyOrder(surveyId);
 		
 		for (int index = 0; index < surveyHistoryList.size(); index++) {
 			JsonObject result = new JsonObject();
@@ -118,8 +118,8 @@ public class SurveyServerService {
 			String botUserId = surveyHistoryList.get(index).getSurveyHistoryPK().getBotUserId();
 			String questionTitle = questionItem.getDescription();
 			
-			List<Options> optionList = optionsRepository.findByQuestionsOrderByOptionOrder(questionItem.getId());
-			Answers answer = answersRepository.findByUsersAndQuestions(botUserId, questionItem.getId());
+			List<Options> optionList = optionsRepository.findByQuestionsIdOrderByOptionOrder(questionItem.getId());
+			Answers answer = answersRepository.findByUsersBotUserIdAndQuestionsId(botUserId, questionItem.getId());
 			
 			if (questionItem.getType().equals("choice")) {
 				JsonObject resultItem = new JsonObject();
