@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.gson.JsonArray;
@@ -17,7 +16,6 @@ import com.kep.surveyServer.model.Answers;
 import com.kep.surveyServer.model.Options;
 import com.kep.surveyServer.model.Questions;
 import com.kep.surveyServer.model.SurveyHistory;
-import com.kep.surveyServer.model.SurveyHistoryPK;
 import com.kep.surveyServer.model.Surveys;
 import com.kep.surveyServer.repository.AnswersRepository;
 import com.kep.surveyServer.repository.OptionsRepository;
@@ -166,7 +164,6 @@ public class SurveyServerService {
 		JsonArray resultList = new JsonArray();
 		
 		List<SurveyHistory> surveyHistoryList = surveyHistoryRepository.findByIdSurveyId(surveyId);
-		// List<Questions> questionList = questionsRepository.findBySurveysIdOrderBySurveyOrder(surveyId);
 		
 		for (int index = 0; index < surveyHistoryList.size(); index++) {
 			JsonObject result = new JsonObject();
@@ -179,14 +176,24 @@ public class SurveyServerService {
 			result.addProperty("participationTime", participationTime);
 			
 			resultList.add(result);
-			
-			/*
-			JsonObject result = new JsonObject();
-			JsonArray resultItemList = new JsonArray();
+		}
+		
+		res.add("resultList", resultList);
+		
+		return res.toString();
+	}
+	
+	/* 설문 결과 :: 상세 결과 조회 */
+	public String getSurveyResultDetail(@RequestParam Long surveyId, @RequestParam String botUserId) {
+		JsonObject res = new JsonObject();
+		JsonArray result = new JsonArray();
+		
+		List<Questions> questionList = questionsRepository.findBySurveysIdOrderBySurveyOrder(surveyId);
+		
+		for (int index = 0; index < questionList.size(); index++) {			
 			JsonArray options = new JsonArray();
 			Questions questionItem = questionList.get(index);
 			
-			String botUserId = surveyHistoryList.get(index).getId().getBotUserId();
 			String questionTitle = questionItem.getDescription();
 			
 			List<Options> optionList = optionsRepository.findByQuestionsIdOrderByOptionOrder(questionItem.getId());
@@ -205,28 +212,24 @@ public class SurveyServerService {
 					options.add(option);
 				}
 				
+				resultItem.addProperty("type", "choice");
 				resultItem.addProperty("question", questionTitle);
 				resultItem.add("options", options);
 				resultItem.addProperty("answer", answer.getAnswer());
 				
-				resultItemList.add(resultItem);
+				result.add(resultItem);
 			} else {
 				JsonObject resultItem = new JsonObject();
 				
+				resultItem.addProperty("type", "text");
 				resultItem.addProperty("question", questionTitle);
 				resultItem.addProperty("answer", answer.getAnswer());
 				
-				resultItemList.add(resultItem);
+				result.add(resultItem);
 			}
-			
-			result.addProperty("botUserId", botUserId);
-			result.add("items", resultItemList);
-			
-			resultList.add(result);
-			*/
 		}
 		
-		res.add("resultList", resultList);
+		res.add("result", result);
 		
 		return res.toString();
 	}
