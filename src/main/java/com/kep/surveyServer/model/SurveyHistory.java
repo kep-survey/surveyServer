@@ -1,5 +1,7 @@
 package com.kep.surveyServer.model;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -36,6 +38,9 @@ public class SurveyHistory {
 	@ManyToOne
 	@JoinColumn(name="bot_user_id", referencedColumnName = "botUserId", nullable = false)
 	private Users users;
+	
+	@Column
+	private Timestamp participationTime;
 	
 	public SurveyHistory(SurveyHistoryPK surveyHistoryPK, int surveyOrder) {
 		this.id = surveyHistoryPK;

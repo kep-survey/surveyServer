@@ -160,15 +160,27 @@ public class SurveyServerService {
 		return res.toString();
 	}
 	
-	/* 설문 결과 :: 결과 상세 가져오기 */
-	public String getSurveyResult(Long surveyId) {
+	/* 설문 결과 :: 응답 유저 리스트 가져오기 */
+	public String getSurveyResultList(Long surveyId) {
 		JsonObject res = new JsonObject();
 		JsonArray resultList = new JsonArray();
 		
 		List<SurveyHistory> surveyHistoryList = surveyHistoryRepository.findByIdSurveyId(surveyId);
-		List<Questions> questionList = questionsRepository.findBySurveysIdOrderBySurveyOrder(surveyId);
+		// List<Questions> questionList = questionsRepository.findBySurveysIdOrderBySurveyOrder(surveyId);
 		
 		for (int index = 0; index < surveyHistoryList.size(); index++) {
+			JsonObject result = new JsonObject();
+			SurveyHistory entity = surveyHistoryList.get(index);
+			
+			String botUserId = entity.getId().getBotUserId();
+			String participationTime = entity.getParticipationTime().toString();
+			
+			result.addProperty("botUserId", botUserId);
+			result.addProperty("participationTime", participationTime);
+			
+			resultList.add(result);
+			
+			/*
 			JsonObject result = new JsonObject();
 			JsonArray resultItemList = new JsonArray();
 			JsonArray options = new JsonArray();
@@ -211,6 +223,7 @@ public class SurveyServerService {
 			result.add("items", resultItemList);
 			
 			resultList.add(result);
+			*/
 		}
 		
 		res.add("resultList", resultList);
