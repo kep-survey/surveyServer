@@ -23,6 +23,12 @@ public class SurveyServerController {
 	@Autowired
 	private SurveyServerService surveyServerService;
 	
+	/* 설문 배포 :: 설문 상태 조회 */
+	@GetMapping("/getSurveyInfo")
+	public String getSurveyInfo(@RequestParam Long surveyId) {
+		return surveyServerService.getSurveyInfo(surveyId);
+	}
+	
 	/* 설문 배포 :: 설문 환영/완료 메시지 저장 */
 	@PostMapping("/setSurveyInfo")
 	public String setSurveyInfo(@RequestBody String req) {
@@ -56,9 +62,9 @@ public class SurveyServerController {
 			JsonNode body = objectMapper.readValue(req, JsonNode.class);
 			
 			Long surveyId = body.get("surveyId").asLong();
-			Boolean open = body.get("open").asBoolean();
+			int status = body.get("status").asInt();
 			
-			return surveyServerService.openSurvey(surveyId, open);
+			return surveyServerService.openSurvey(surveyId, status);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 			

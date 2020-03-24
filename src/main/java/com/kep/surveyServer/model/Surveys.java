@@ -61,8 +61,13 @@ public class Surveys {
 	@Column(length=255)
 	private String completeMsg;
 	
+	/* 1 : 설문 배포전 
+	 * 2 : 설문 배포중
+	 * 3 : 설문 종료
+	 */
 	@Column
-	private Boolean open = false;
+	@ColumnDefault("1")
+	private int status;
 	
 	@OneToMany(mappedBy="surveys")
 	private List<SurveyHistory> surveyHistorys = new ArrayList<SurveyHistory>();
