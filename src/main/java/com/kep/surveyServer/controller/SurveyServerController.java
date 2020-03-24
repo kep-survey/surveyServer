@@ -84,7 +84,14 @@ public class SurveyServerController {
 	
 	/* 설문 결과 :: 유저 응답 리스트 가져오기 */
 	@GetMapping("/getSurveyResultList")
-	public String getSurveyResult(@RequestParam Long surveyId) {
-		return surveyServerService.getSurveyResult(surveyId);
+	public String getSurveyResultList(@RequestParam Long surveyId) {
+		return surveyServerService.getSurveyResultList(surveyId);
 	}
+	
+	/* 설문 결과 :: 상세 결과 조회 */
+	@GetMapping("/getSurveyResultDetail")
+	public String getSurveyResultDetail(@RequestParam Long surveyId, @RequestParam String botUserId) {
+		return surveyServerService.getSurveyResultDetail(surveyId, botUserId);
+	}
+	
 }
