@@ -1,6 +1,7 @@
 package com.kep.surveyServer.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,7 @@ import com.kep.surveyServer.service.SurveyServerService;
 
 @RestController
 @RequestMapping("/api/*")
+@CrossOrigin
 public class SurveyServerController {
 	
 	@Autowired
@@ -70,12 +72,12 @@ public class SurveyServerController {
 	
 	/* 설문 현황 :: 설문 현황 리스트 가져오기 */
 	@GetMapping("/getSurveyStatus")
-	public String getSurveyStatus() {
-		return surveyServerService.getSurveyStatus();
+	public String getSurveyStatus(@RequestParam Long registerId) {
+		return surveyServerService.getSurveyStatus(registerId);
 	}
 	
-	/* 설문 결과 :: 결과 상세 가져오기 */
-	@GetMapping("/getSurveyResult")
+	/* 설문 결과 :: 유저 응답 리스트 가져오기 */
+	@GetMapping("/getSurveyResultList")
 	public String getSurveyResult(@RequestParam Long surveyId) {
 		return surveyServerService.getSurveyResult(surveyId);
 	}

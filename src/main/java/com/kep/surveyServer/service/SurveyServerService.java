@@ -3,7 +3,6 @@ package com.kep.surveyServer.service;
 import java.util.List;
 import java.util.Optional;
 
-import org.aspectj.weaver.patterns.TypePatternQuestions.Question;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +12,7 @@ import com.kep.surveyServer.model.Answers;
 import com.kep.surveyServer.model.Options;
 import com.kep.surveyServer.model.Questions;
 import com.kep.surveyServer.model.SurveyHistory;
+import com.kep.surveyServer.model.SurveyHistoryPK;
 import com.kep.surveyServer.model.Surveys;
 import com.kep.surveyServer.repository.AnswersRepository;
 import com.kep.surveyServer.repository.OptionsRepository;
@@ -25,9 +25,17 @@ public class SurveyServerService {
 	
 	@Autowired
 	private SurveysRepository surveysRepository;
+	
+	@Autowired
 	private SurveyHistoryRepository surveyHistoryRepository;
+	
+	@Autowired
 	private QuestionsRepository questionsRepository;
+	
+	@Autowired
 	private OptionsRepository optionsRepository;
+	
+	@Autowired
 	private AnswersRepository answersRepository;
 	
 	/* 설문 배포 :: 설문 환영/완료 메시지 저장 */
@@ -74,25 +82,30 @@ public class SurveyServerService {
 	}
 	
 	/* 설문 현황 :: 설문 현황 리스트 가져오기 */
-	public String getSurveyStatus() {
+	public String getSurveyStatus(Long registerId) {
 		JsonObject res = new JsonObject();
 		JsonArray statusList = new JsonArray();
 		
-		List<Surveys> surveys = surveysRepository.findByOpenTrue();
+		List<Surveys> surveys = surveysRepository.findByOpenTrueAndRegistersId(registerId);
 		
 		for (int index = 0; index < surveys.size(); index++) {
 			JsonObject item = new JsonObject();
 			Surveys survey = surveys.get(index);
-			
-			List<SurveyHistory> surveyHistory = surveyHistoryRepository.findBySurveyHistoryPKSurveyId(survey.getId());
-			
-			item.addProperty("surveyId", survey.getId());
-			item.addProperty("surveyName", survey.getTitle());
-			item.addProperty("responseNum", surveyHistory.size());
-			item.addProperty("surveyStartDate", survey.getStartDatetime().toString());
-			item.addProperty("surveyEndTime", survey.getEndDatetime().toString());
-			
-			statusList.add(item);
+			Long surveyId = survey.getId();
+
+			try {
+				List<SurveyHistory> surveyHistory = surveyHistoryRepository.findByIdSurveyId(surveyId);
+				
+				item.addProperty("surveyId", surveyId);
+				item.addProperty("surveyName", survey.getTitle());
+				item.addProperty("count", surveyHistory.size());
+				item.addProperty("startDate", survey.getStartDatetime().toString());
+				item.addProperty("endDate", survey.getEndDatetime().toString());
+				
+				statusList.add(item);
+			} catch (NullPointerException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		res.add("statusList", statusList);
@@ -105,8 +118,8 @@ public class SurveyServerService {
 		JsonObject res = new JsonObject();
 		JsonArray resultList = new JsonArray();
 		
-		List<SurveyHistory> surveyHistoryList = surveyHistoryRepository.findBySurveyHistoryPKSurveyId(surveyId);
-		List<Questions> questionList = questionsRepository.findBySurveyIdOrderBySurveyOrder(surveyId);
+		List<SurveyHistory> surveyHistoryList = surveyHistoryRepository.findByIdSurveyId(surveyId);
+		List<Questions> questionList = questionsRepository.findBySurveysIdOrderBySurveyOrder(surveyId);
 		
 		for (int index = 0; index < surveyHistoryList.size(); index++) {
 			JsonObject result = new JsonObject();
@@ -114,11 +127,11 @@ public class SurveyServerService {
 			JsonArray options = new JsonArray();
 			Questions questionItem = questionList.get(index);
 			
-			String botUserId = surveyHistoryList.get(index).getSurveyHistoryPK().getBotUserId();
+			String botUserId = surveyHistoryList.get(index).getId().getBotUserId();
 			String questionTitle = questionItem.getDescription();
 			
-			List<Options> optionList = optionsRepository.findByQuestionIdOrderByOptionOrder(questionItem.getId());
-			Answers answer = answersRepository.findByBotUserIdAndQuestionId(botUserId, questionItem.getId());
+			List<Options> optionList = optionsRepository.findByQuestionsIdOrderByOptionOrder(questionItem.getId());
+			Answers answer = answersRepository.findByUsersBotUserIdAndQuestionsId(botUserId, questionItem.getId());
 			
 			if (questionItem.getType().equals("choice")) {
 				JsonObject resultItem = new JsonObject();
