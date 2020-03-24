@@ -1,10 +1,15 @@
 package com.kep.surveyServer.service;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -38,6 +43,25 @@ public class SurveyServerService {
 	@Autowired
 	private AnswersRepository answersRepository;
 	
+	/* 설문 배포 :: 설문 상태 조회 */
+	public String getSurveyInfo(@RequestParam Long surveyId) {
+		JsonObject res = new JsonObject();
+		
+		try {
+			Optional<Surveys> survey = surveysRepository.findById(surveyId);
+			Surveys entity = survey.get();
+			
+			res.addProperty("welcomeMsg", entity.getWelcomeMsg());
+			res.addProperty("completeMsg", entity.getCompleteMsg());
+			res.addProperty("status", entity.getStatus());
+		} catch (Exception e ) {
+			res.addProperty("result", "false");
+			res.addProperty("msg", "Message update failed");
+		}
+		
+		return res.toString();
+	}
+	
 	/* 설문 배포 :: 설문 환영/완료 메시지 저장 */
 	public String setSurveyInfo(Long surveyId, String welcomeMsg, String completeMsg) {
 		JsonObject res = new JsonObject();
@@ -61,19 +85,37 @@ public class SurveyServerService {
 	}
 	
 	/* 설문 배포 :: 설문 상태 관리 */
-	public String openSurvey(Long surveyId, Boolean open) {
+	public String openSurvey(Long surveyId, int status) {
 		JsonObject res = new JsonObject();
 		
 		try {
+			SimpleDateFormat format = new SimpleDateFormat ( "yyyy-MM-dd HH:mm:ss");
+			Date time = new Date();
+			
 			Optional<Surveys> survey = surveysRepository.findById(surveyId); 
 			Surveys entity = survey.get();
-			entity.setOpen(open);
+
+			if (status == 2) {
+				entity.setStatus(status);
+				
+				String startDate = format.format(time);
+				entity.setStartDatetime(Timestamp.valueOf(startDate));
+				entity.setEndDatetime(null);
+			} else if (status == 3){
+				entity.setStatus(status);
+				
+				String endDate = format.format(time);
+				entity.setEndDatetime(Timestamp.valueOf(endDate));
+			} else {
+				throw new Exception();
+			}
 			
 			surveysRepository.save(entity);
 			
 			res.addProperty("result", "true");
 			res.addProperty("msg", "Deployment finished successfully");
 		} catch(Exception e) {
+			e.printStackTrace();
 			res.addProperty("result", "false");
 			res.addProperty("msg", "Deployment failed");
 		}
@@ -86,7 +128,7 @@ public class SurveyServerService {
 		JsonObject res = new JsonObject();
 		JsonArray statusList = new JsonArray();
 		
-		List<Surveys> surveys = surveysRepository.findByOpenTrueAndRegistersId(registerId);
+		List<Surveys> surveys = surveysRepository.findByStatusNotAndRegistersId(1, registerId);
 		
 		for (int index = 0; index < surveys.size(); index++) {
 			JsonObject item = new JsonObject();
@@ -100,10 +142,15 @@ public class SurveyServerService {
 				item.addProperty("surveyName", survey.getTitle());
 				item.addProperty("count", surveyHistory.size());
 				item.addProperty("startDate", survey.getStartDatetime().toString());
-				item.addProperty("endDate", survey.getEndDatetime().toString());
+				
+				try {
+					item.addProperty("endDate", survey.getEndDatetime().toString());
+				} catch (NullPointerException e) {
+					item.addProperty("endDate", "");
+				}
 				
 				statusList.add(item);
-			} catch (NullPointerException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}

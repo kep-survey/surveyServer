@@ -11,5 +11,5 @@ import com.kep.surveyServer.model.Surveys;
 @Repository
 public interface SurveysRepository extends JpaRepository<Surveys, Long>{
 	
-	List<Surveys> findByOpenTrueAndRegistersId(Long registerId);
+	List<Surveys> findByStatusNotAndRegistersId(int status, Long registerId);
 }
