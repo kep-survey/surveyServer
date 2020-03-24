@@ -17,29 +17,28 @@ import lombok.ToString;
 
 @NoArgsConstructor
 @Getter @Setter
-@ToString
 @Entity
 @Table(name="SURVEY_HISTORY")
 public class SurveyHistory {
 
 	@EmbeddedId
-	private SurveyHistoryPK surveyHistoryPK;
+	private SurveyHistoryPK id;
 	
 	@Column(nullable=false)
 	private int surveyOrder;
 	
 	@MapsId("surveyId")
 	@ManyToOne
-	@JoinColumn(name = "surveyId", referencedColumnName = "id", nullable = false)
+	@JoinColumn(name="survey_id", referencedColumnName = "id", nullable = false)
 	private Surveys surveys;
 	
 	@MapsId("botUserId")
 	@ManyToOne
-	@JoinColumn(name = "botUserId", referencedColumnName = "botUserId", nullable = false)
+	@JoinColumn(name="bot_user_id", referencedColumnName = "botUserId", nullable = false)
 	private Users users;
 	
 	public SurveyHistory(SurveyHistoryPK surveyHistoryPK, int surveyOrder) {
-		this.surveyHistoryPK = surveyHistoryPK;
+		this.id = surveyHistoryPK;
 		this.surveyOrder = surveyOrder;
 	}
 }

@@ -1,6 +1,7 @@
 package com.kep.surveyServer.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,10 +15,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import com.kep.surveyServer.service.SurveyServerService;
 
-import lombok.AllArgsConstructor;
-
 @RestController
 @RequestMapping("/api/*")
+@CrossOrigin
 public class SurveyServerController {
 	
 	@Autowired

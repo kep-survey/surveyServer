@@ -12,6 +12,7 @@ import com.kep.surveyServer.model.Answers;
 import com.kep.surveyServer.model.Options;
 import com.kep.surveyServer.model.Questions;
 import com.kep.surveyServer.model.SurveyHistory;
+import com.kep.surveyServer.model.SurveyHistoryPK;
 import com.kep.surveyServer.model.Surveys;
 import com.kep.surveyServer.repository.AnswersRepository;
 import com.kep.surveyServer.repository.OptionsRepository;
@@ -19,16 +20,22 @@ import com.kep.surveyServer.repository.QuestionsRepository;
 import com.kep.surveyServer.repository.SurveyHistoryRepository;
 import com.kep.surveyServer.repository.SurveysRepository;
 
-import lombok.AllArgsConstructor;
-
 @Service
 public class SurveyServerService {
 	
 	@Autowired
 	private SurveysRepository surveysRepository;
+	
+	@Autowired
 	private SurveyHistoryRepository surveyHistoryRepository;
+	
+	@Autowired
 	private QuestionsRepository questionsRepository;
+	
+	@Autowired
 	private OptionsRepository optionsRepository;
+	
+	@Autowired
 	private AnswersRepository answersRepository;
 	
 	/* 설문 배포 :: 설문 환영/완료 메시지 저장 */
@@ -84,16 +91,21 @@ public class SurveyServerService {
 		for (int index = 0; index < surveys.size(); index++) {
 			JsonObject item = new JsonObject();
 			Surveys survey = surveys.get(index);
-			
-			List<SurveyHistory> surveyHistory = surveyHistoryRepository.findBySurveyHistoryPKSurveyId(survey.getId());
-			
-			item.addProperty("surveyId", survey.getId());
-			item.addProperty("surveyName", survey.getTitle());
-			item.addProperty("count", surveyHistory.size());
-			item.addProperty("startDate", survey.getStartDatetime().toString());
-			item.addProperty("endTime", survey.getEndDatetime().toString());
-			
-			statusList.add(item);
+			Long surveyId = survey.getId();
+
+			try {
+				List<SurveyHistory> surveyHistory = surveyHistoryRepository.findByIdSurveyId(surveyId);
+				
+				item.addProperty("surveyId", surveyId);
+				item.addProperty("surveyName", survey.getTitle());
+				item.addProperty("count", surveyHistory.size());
+				item.addProperty("startDate", survey.getStartDatetime().toString());
+				item.addProperty("endDate", survey.getEndDatetime().toString());
+				
+				statusList.add(item);
+			} catch (NullPointerException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		res.add("statusList", statusList);
@@ -106,7 +118,7 @@ public class SurveyServerService {
 		JsonObject res = new JsonObject();
 		JsonArray resultList = new JsonArray();
 		
-		List<SurveyHistory> surveyHistoryList = surveyHistoryRepository.findBySurveyHistoryPKSurveyId(surveyId);
+		List<SurveyHistory> surveyHistoryList = surveyHistoryRepository.findByIdSurveyId(surveyId);
 		List<Questions> questionList = questionsRepository.findBySurveysIdOrderBySurveyOrder(surveyId);
 		
 		for (int index = 0; index < surveyHistoryList.size(); index++) {
@@ -115,7 +127,7 @@ public class SurveyServerService {
 			JsonArray options = new JsonArray();
 			Questions questionItem = questionList.get(index);
 			
-			String botUserId = surveyHistoryList.get(index).getSurveyHistoryPK().getBotUserId();
+			String botUserId = surveyHistoryList.get(index).getId().getBotUserId();
 			String questionTitle = questionItem.getDescription();
 			
 			List<Options> optionList = optionsRepository.findByQuestionsIdOrderByOptionOrder(questionItem.getId());
