@@ -1,5 +1,8 @@
 package com.kep.surveyServer.controller;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +16,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
+
+import com.kep.surveyServer.model.Questions;
 import com.kep.surveyServer.service.SurveyServerService;
 
 @RestController
@@ -23,15 +28,116 @@ public class SurveyServerController {
 	@Autowired
 	private SurveyServerService surveyServerService;
 	
-	/* 설문 배포 :: 설문 상태 조회 */
+	@PostMapping("/createSurvey")
+	public String createSurvey(@RequestBody String req) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		
+		try {
+			JsonNode body = objectMapper.readValue(req, JsonNode.class);
+			String surveyTitle = body.get("title").asText();
+			String surveyDesc = body.get("description").asText();
+			
+			return surveyServerService.createSurvey(surveyTitle, surveyDesc);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			
+			JsonObject res = new JsonObject();
+			res.addProperty("result", "false");
+			res.addProperty("msg", "Json processing error occurred");
+			
+			return res.toString();
+		}
+	}
+	
+	@GetMapping("/getSurveyList")
+	public String getSurveyList() {
+		return surveyServerService.getSurveyList();
+	}
+	
+	@PostMapping("/deleteSurvey")
+	public String deleteSurvey(@RequestBody String req) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		
+		try {
+			JsonNode body = objectMapper.readValue(req, JsonNode.class);
+			Long surveyId = body.get("surveyId").asLong();
+			
+			return surveyServerService.deleteSurvey(surveyId);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			
+			JsonObject res = new JsonObject();
+			res.addProperty("result", "false");
+			res.addProperty("msg", "Json processing error occurred");
+			
+			return res.toString();
+		}
+	}
+	
+	@GetMapping("/getSurvey")
+	public String getSurvey(@RequestParam Long surveyId) {
+		return surveyServerService.getSurvey(surveyId);
+	}
+	
+	@PostMapping("/saveSurvey")
+	public String saveSurvey(@RequestBody String req) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		
+		try {
+			JsonNode body = objectMapper.readValue(req, JsonNode.class);
+			Long surveyId = body.get("surveyId").asLong();
+			Questions[] temp = objectMapper.convertValue(body.get("questions"), Questions[].class);
+			List<Questions> questions = Arrays.asList(temp);
+			
+			return surveyServerService.saveSurvey(surveyId, questions);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			
+			JsonObject res = new JsonObject();
+			res.addProperty("result", "false");
+			res.addProperty("msg", "Json processing error occurred");
+			
+			return res.toString();
+		}
+	}
+	
 	@GetMapping("/getSurveyInfo")
 	public String getSurveyInfo(@RequestParam Long surveyId) {
 		return surveyServerService.getSurveyInfo(surveyId);
 	}
 	
-	/* 설문 배포 :: 설문 환영/완료 메시지 저장 */
 	@PostMapping("/setSurveyInfo")
 	public String setSurveyInfo(@RequestBody String req) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		
+		try {
+			JsonNode body = objectMapper.readValue(req, JsonNode.class);
+
+			Long surveyId = body.get("surveyId").asLong();
+			String title = body.get("title").asText();
+			String description = body.get("description").asText();
+			
+			return surveyServerService.setSurveyInfo(surveyId, title, description);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			
+			JsonObject res = new JsonObject();
+			res.addProperty("result", "false");
+			res.addProperty("msg", "Json processing error occurred");
+			
+			return res.toString();
+		}
+	}
+	
+	/* 설문 배포 :: 설문 상태 조회 */
+	@GetMapping("/getSurveyDeploy")
+	public String getSurveyDeploy(@RequestParam Long surveyId) {
+		return surveyServerService.getSurveyDeploy(surveyId);
+	}
+	
+	/* 설문 배포 :: 설문 환영/완료 메시지 저장 */
+	@PostMapping("/setSurveyMsg")
+	public String setSurveyMsg(@RequestBody String req) {
 		ObjectMapper objectMapper = new ObjectMapper();
 		
 		try {
@@ -41,7 +147,7 @@ public class SurveyServerController {
 			String welcomeMsg = body.get("welcomeMsg").asText();
 			String completeMsg = body.get("completeMsg").asText();
 			
-			return surveyServerService.setSurveyInfo(surveyId, welcomeMsg, completeMsg);
+			return surveyServerService.setSurveyMsg(surveyId, welcomeMsg, completeMsg);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 			
