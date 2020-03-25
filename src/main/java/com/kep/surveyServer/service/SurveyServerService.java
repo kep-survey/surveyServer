@@ -177,7 +177,7 @@ public class SurveyServerService {
 			Surveys survey = surveysRepository.findByIdAndRegisters(surveyId, register).get();
 			
 			// 질문 리스트 불러오기
-			List<Questions> questions = questionsRepository.findBySurveysOrderByQuestionOrder(survey);
+			List<Questions> questions = questionsRepository.findBySurveysIdOrderByQuestionOrder(survey.getId());
 			
 			for(Questions question : questions) {
 				JsonObject questionObject = new JsonObject();
@@ -495,7 +495,7 @@ public class SurveyServerService {
 		JsonObject res = new JsonObject();
 		JsonArray result = new JsonArray();
 		
-		List<Questions> questionList = questionsRepository.findBySurveysIdOrderBySurveyOrder(surveyId);
+		List<Questions> questionList = questionsRepository.findBySurveysIdOrderByQuestionOrder(surveyId);
 		
 		for (int index = 0; index < questionList.size(); index++) {			
 			JsonArray options = new JsonArray();
