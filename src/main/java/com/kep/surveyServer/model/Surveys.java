@@ -69,7 +69,7 @@ public class Surveys {
 	 */
 	@Column
 	@ColumnDefault("1")
-	private int status;
+	private int status = 1;
 	
 	@OneToMany(mappedBy="surveys")
 	private List<SurveyHistory> surveyHistorys = new ArrayList<SurveyHistory>();
