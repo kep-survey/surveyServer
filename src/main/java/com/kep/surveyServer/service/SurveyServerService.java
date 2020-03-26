@@ -472,7 +472,7 @@ public class SurveyServerService {
 			JsonObject result = new JsonObject();
 			SurveyHistory entity = surveyHistoryList.get(index);
 		
-			if(entity.getSurveyOrder() != (sumQuestions + 1)) {
+			if(entity.getQuestionOrder() != sumQuestions) {
 				continue;
 			}
 			

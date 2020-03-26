@@ -24,7 +24,7 @@ public class SurveyHistory {
 	private SurveyHistoryPK id;
 	
 	@Column(nullable=false)
-	private int surveyOrder;
+	private int questionOrder;
 	
 	@MapsId("surveyId")
 	@ManyToOne
@@ -39,8 +39,8 @@ public class SurveyHistory {
 	@Column
 	private Timestamp participationTime;
 	
-	public SurveyHistory(SurveyHistoryPK surveyHistoryPK, int surveyOrder) {
+	public SurveyHistory(SurveyHistoryPK surveyHistoryPK, int questionOrder) {
 		this.id = surveyHistoryPK;
-		this.surveyOrder = surveyOrder;
+		this.questionOrder = questionOrder;
 	}
 }
