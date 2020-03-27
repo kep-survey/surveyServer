@@ -361,14 +361,20 @@ public class SurveyServerService {
 	}
 	
 	/* 설문 배포 :: 설문 환영/완료 메시지 저장 */
-	public String setSurveyMsg(Long surveyId, String welcomeMsg, String completeMsg) {
+	public String setSurveyMsg(String flag, Long surveyId, String welcomeMsg, String completeMsg) {
 		JsonObject res = new JsonObject();
 		
 		try {
 			Optional<Surveys> survey = surveysRepository.findById(surveyId); 
 			Surveys entity = survey.get();
-			entity.setWelcomeMsg(welcomeMsg);
-			entity.setCompleteMsg(completeMsg);
+			
+			if (flag.equals("welcome")) {
+				entity.setWelcomeMsg(welcomeMsg);
+			} else if (flag.equals("complete")){
+				entity.setCompleteMsg(completeMsg);
+			} else {
+				throw new Exception();
+			}
 			
 			surveysRepository.save(entity);
 			
@@ -485,6 +491,7 @@ public class SurveyServerService {
 			resultList.add(result);
 		}
 		
+		res.addProperty("title", survey.getTitle());
 		res.add("resultList", resultList);
 		
 		return res.toString();
@@ -494,6 +501,9 @@ public class SurveyServerService {
 	public String getSurveyResultDetail(@RequestParam Long surveyId, @RequestParam String botUserId) {
 		JsonObject res = new JsonObject();
 		JsonArray result = new JsonArray();
+		
+		Optional<Surveys> survey = surveysRepository.findById(surveyId);
+		Surveys entity = survey.get();
 		
 		List<Questions> questionList = questionsRepository.findBySurveysIdOrderByQuestionOrder(surveyId);
 		
@@ -536,6 +546,7 @@ public class SurveyServerService {
 			}
 		}
 		
+		res.addProperty("title", entity.getTitle());
 		res.add("result", result);
 		
 		return res.toString();

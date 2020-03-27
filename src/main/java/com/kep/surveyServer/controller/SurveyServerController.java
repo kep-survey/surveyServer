@@ -143,11 +143,22 @@ public class SurveyServerController {
 		try {
 			JsonNode body = objectMapper.readValue(req, JsonNode.class);
 			
+			String flag = body.get("flag").asText();
 			Long surveyId = body.get("surveyId").asLong();
-			String welcomeMsg = body.get("welcomeMsg").asText();
-			String completeMsg = body.get("completeMsg").asText();
+			String welcomeMsg, completeMsg;
 			
-			return surveyServerService.setSurveyMsg(surveyId, welcomeMsg, completeMsg);
+			if (flag.equals("welcome")) {
+				welcomeMsg = body.get("welcomeMsg").asText();
+				completeMsg = "";
+			} else if (flag.equals("complete")){
+				welcomeMsg = "";
+				completeMsg = body.get("completeMsg").asText();
+			} else {
+				welcomeMsg = "";
+				completeMsg = "";
+			}
+			
+			return surveyServerService.setSurveyMsg(flag, surveyId, welcomeMsg, completeMsg);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 			
