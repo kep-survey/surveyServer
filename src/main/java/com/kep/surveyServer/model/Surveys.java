@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -71,15 +72,15 @@ public class Surveys {
 	@ColumnDefault("1")
 	private int status = 1;
 	
-	@OneToMany(mappedBy="surveys")
+	@OneToMany(mappedBy="surveys", cascade=CascadeType.REMOVE)
 	private List<SurveyHistory> surveyHistorys = new ArrayList<SurveyHistory>();
 	
-	@OneToMany(mappedBy="surveys")
+	@OneToMany(mappedBy="surveys", cascade=CascadeType.REMOVE)
 	private List<Questions> questions = new ArrayList<Questions>();
 	
-	@OneToMany(mappedBy="surveys")
+	@OneToMany(mappedBy="surveys", cascade=CascadeType.REMOVE)
 	private List<Answers> answers = new ArrayList<Answers>();
 	
-	@OneToMany(mappedBy="surveys")
+	@OneToMany(mappedBy="surveys", cascade=CascadeType.REMOVE)
 	private List<Options> options = new ArrayList<Options>();
 }

@@ -3,6 +3,7 @@ package com.kep.surveyServer.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -29,9 +30,9 @@ public class Users {
 	// Male(1), Female(2), Unknown(3)
 	private int gender;
 	
-	@OneToMany(mappedBy="users")
+	@OneToMany(mappedBy="users", cascade=CascadeType.REMOVE)
 	private List<SurveyHistory> surveyHistories = new ArrayList<SurveyHistory>();
 	
-	@OneToMany(mappedBy="users")
+	@OneToMany(mappedBy="users", cascade=CascadeType.REMOVE)
 	private List<Answers> answers = new ArrayList<Answers>();
 }

@@ -3,6 +3,7 @@ package com.kep.surveyServer.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -34,7 +35,7 @@ public class Registers {
 	@Column(length=20, nullable=false)
 	private String organization;
 	
-	@OneToMany(mappedBy="registers")
+	@OneToMany(mappedBy="registers", cascade=CascadeType.REMOVE)
 	private List<Surveys> surveys = new ArrayList<Surveys>();
 	
 	public Registers(String name, String organization) {

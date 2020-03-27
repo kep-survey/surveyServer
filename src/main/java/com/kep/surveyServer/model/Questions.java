@@ -55,9 +55,9 @@ public class Questions {
 	@UpdateTimestamp
 	private Timestamp updatedDatetime;
 	
-	@OneToMany(mappedBy="questions")
+	@OneToMany(mappedBy="questions", cascade=CascadeType.REMOVE)
 	private List<Answers> answers = new ArrayList<Answers>();
 	
-	@OneToMany(mappedBy="questions")
+	@OneToMany(mappedBy="questions", cascade=CascadeType.REMOVE)
 	private List<Options> options = new ArrayList<Options>();
 }
