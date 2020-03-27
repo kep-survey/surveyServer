@@ -115,6 +115,7 @@ public class SurveyServerService {
 			info.addProperty("title", survey.getTitle());
 			info.addProperty("description", survey.getDescription());
 			
+			res.addProperty("status", survey.getStatus());
 			res.addProperty("result", true);
 			res.add("info", info);
 			
