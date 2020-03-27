@@ -58,10 +58,10 @@ public class Surveys {
 	private Timestamp endDatetime;
 	
 	@Column(length=255)
-	private String welcomeMsg;
+	private String welcomeMsg = "";
 	
 	@Column(length=255)
-	private String completeMsg;
+	private String completeMsg = "";
 	
 	/* 1 : 설문 배포전 
 	 * 2 : 설문 배포중
