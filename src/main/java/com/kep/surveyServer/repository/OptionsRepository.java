@@ -14,6 +14,7 @@ public interface OptionsRepository extends JpaRepository<Options, Long>{
 	
 	List<Options> findByQuestionsIdOrderByOptionOrder(Long questionId);
 
-	List<Options> findBySurveysAndQuestionsOrderByOptionOrder(Surveys survey, Questions question);
+	List<Options> findBySurveysIdAndQuestionsIdOrderByOptionOrder(Long surveyId, Long questionId);
 
+	List<Options> findBySurveysId(Long surveyId);
 }

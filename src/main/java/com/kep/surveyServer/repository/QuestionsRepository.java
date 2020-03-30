@@ -14,6 +14,8 @@ import com.kep.surveyServer.model.Surveys;
 public interface QuestionsRepository extends JpaRepository<Questions, Long>{
 
 	List<Questions> findBySurveysIdOrderByQuestionOrder(Long surveyId);
+	
+	List<Questions> findBySurveysId(Long surveyId);
 
 	@Transactional
     @Modifying

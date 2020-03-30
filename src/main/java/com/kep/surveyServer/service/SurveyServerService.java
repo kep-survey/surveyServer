@@ -149,6 +149,60 @@ public class SurveyServerService {
 		return res.toString();
 	}
 	
+	public String copySurvey(Long surveyId) {
+		JsonObject res = new JsonObject();
+		
+		try {
+			Surveys survey = surveysRepository.findById(surveyId).get();
+			List<Questions> questions = questionsRepository.findBySurveysId(surveyId);
+			List<Options> options = optionsRepository.findBySurveysId(surveyId);
+			
+			Surveys surveyEntity = new Surveys().builder()
+												.register(survey.getRegisters())
+												.sumQuestions(survey.getSumQuestions())
+												.title(survey.getTitle())
+												.description(survey.getDescription())
+												.welcomeMsg(survey.getWelcomeMsg())
+												.completeMsg(survey.getCompleteMsg())
+												.build();
+			Surveys newSurvey = surveysRepository.save(surveyEntity);
+			
+			for (int index = 0; index < questions.size(); index++) {
+				Questions questionEntity = questions.get(index);
+				Questions newQuestion = new Questions().builder()
+															.surveys(newSurvey)
+															.type(questionEntity.getType())
+															.questionOrder(questionEntity.getQuestionOrder())
+															.description(questionEntity.getDescription())
+															.build();
+				
+				Questions newQuestionEntity = questionsRepository.save(newQuestion);
+				
+				List<Options> newOptions = new ArrayList<Options>();
+				for (int second_index = 0; second_index < questions.size(); second_index++) {
+					Options entity = options.get(second_index);
+					Options newOption = new Options().builder()
+																.surveys(newSurvey)
+																.questions(newQuestionEntity)
+																.optionOrder(entity.getOptionOrder())
+																.option(entity.getOption())
+																.build();
+					newOptions.add(newOption);
+				}
+				optionsRepository.saveAll(newOptions);
+			}
+			
+			res.addProperty("result", true);
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			res.addProperty("result", false);
+			res.addProperty("msg", "해당하는 설문이 존재하지 않습니다. 다시 시도해주세요");
+		}
+		
+		return res.toString();
+	}
+	
 	public String deleteSurvey(Long surveyId) {
 		JsonObject res = new JsonObject();
 		

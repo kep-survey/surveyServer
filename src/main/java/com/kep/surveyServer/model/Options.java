@@ -9,6 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,4 +37,12 @@ public class Options {
 	
 	@Column
 	private int optionOrder;
+	
+	@Builder
+	public Options(Surveys surveys, Questions questions, String option, int optionOrder) {
+		this.surveys = surveys;
+		this.questions = questions;
+		this.option = option;
+		this.optionOrder = optionOrder;
+	}
 }

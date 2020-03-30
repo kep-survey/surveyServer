@@ -18,6 +18,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -60,4 +61,12 @@ public class Questions {
 	
 	@OneToMany(mappedBy="questions", cascade=CascadeType.REMOVE)
 	private List<Options> options = new ArrayList<Options>();
+	
+	@Builder
+	public Questions(Surveys surveys, String type, int questionOrder, String description) {
+		this.surveys = surveys;
+		this.type = type;
+		this.questionOrder = questionOrder;
+		this.description = description;
+	}
 }

@@ -54,6 +54,26 @@ public class SurveyServerController {
 		return surveyServerService.getSurveyList();
 	}
 	
+	@PostMapping("copySurvey")
+	public String copySurvey(@RequestBody String req) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		
+		try {
+			JsonNode body = objectMapper.readValue(req, JsonNode.class);
+			Long surveyId = body.get("surveyId").asLong();
+			
+			return surveyServerService.copySurvey(surveyId);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			
+			JsonObject res = new JsonObject();
+			res.addProperty("result", "false");
+			res.addProperty("msg", "Json processing error occurred");
+			
+			return res.toString();
+		}
+	}
+	
 	@PostMapping("/deleteSurvey")
 	public String deleteSurvey(@RequestBody String req) {
 		ObjectMapper objectMapper = new ObjectMapper();

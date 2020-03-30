@@ -19,6 +19,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -83,4 +84,14 @@ public class Surveys {
 	
 	@OneToMany(mappedBy="surveys", cascade=CascadeType.REMOVE)
 	private List<Options> options = new ArrayList<Options>();
+	
+	@Builder
+	public Surveys(Registers register, int sumQuestions, String title, String description, String welcomeMsg, String completeMsg) {
+		this.registers = register;
+		this.sumQuestions = sumQuestions;
+		this.title = title;
+		this.description = description;
+		this.welcomeMsg = welcomeMsg;
+		this.completeMsg = completeMsg;
+	}
 }
