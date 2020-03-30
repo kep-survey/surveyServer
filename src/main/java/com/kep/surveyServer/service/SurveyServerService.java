@@ -495,7 +495,7 @@ public class SurveyServerService {
 			Long surveyId = survey.getId();
 
 			try {
-				List<SurveyHistory> surveyHistory = surveyHistoryRepository.findByIdSurveyId(surveyId);
+				List<SurveyHistory> surveyHistory = surveyHistoryRepository.findByIdSurveyIdAndQuestionOrderIs(surveyId, survey.getSumQuestions());
 				
 				item.addProperty("surveyId", surveyId);
 				item.addProperty("surveyName", survey.getTitle());
@@ -524,18 +524,14 @@ public class SurveyServerService {
 		JsonObject res = new JsonObject();
 		JsonArray resultList = new JsonArray();
 		
-		List<SurveyHistory> surveyHistoryList = surveyHistoryRepository.findByIdSurveyId(surveyId);
 		Optional<Surveys> optionalSurvey = surveysRepository.findById(surveyId);
 		Surveys survey = optionalSurvey.get();
-		int sumQuestions = survey.getSumQuestions();
+		
+		List<SurveyHistory> surveyHistoryList = surveyHistoryRepository.findByIdSurveyIdAndQuestionOrderIs(surveyId, survey.getSumQuestions());
 		
 		for (int index = 0; index < surveyHistoryList.size(); index++) {			
 			JsonObject result = new JsonObject();
 			SurveyHistory entity = surveyHistoryList.get(index);
-		
-			if(entity.getQuestionOrder() != sumQuestions) {
-				continue;
-			}
 			
 			String botUserId = entity.getId().getBotUserId();
 			String participationTime = entity.getParticipationTime().toString();
