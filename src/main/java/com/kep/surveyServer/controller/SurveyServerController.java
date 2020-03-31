@@ -225,6 +225,12 @@ public class SurveyServerController {
 		return surveyServerService.getSurveyResultList(surveyId);
 	}
 	
+	/* 설문 결과 :: 결과 분석 데이터 가져오기 */
+	@GetMapping("/getSurveyResultAnalysis")
+	public String getSurveyResultAnalysis(@RequestParam Long surveyId) {
+		return surveyServerService.getSurveyResultAnalysis(surveyId);
+	}
+	
 	/* 설문 결과 :: 상세 결과 조회 */
 	@GetMapping("/getSurveyResultDetail")
 	public String getSurveyResultDetail(@RequestParam Long surveyId, @RequestParam String botUserId) {

@@ -495,7 +495,7 @@ public class SurveyServerService {
 			Long surveyId = survey.getId();
 
 			try {
-				List<SurveyHistory> surveyHistory = surveyHistoryRepository.findByIdSurveyIdAndQuestionOrderIs(surveyId, survey.getSumQuestions());
+				List<SurveyHistory> surveyHistory = surveyHistoryRepository.findByIdSurveyIdAndQuestionOrderIsNot(surveyId, 0);
 				
 				item.addProperty("surveyId", surveyId);
 				item.addProperty("surveyName", survey.getTitle());
@@ -527,7 +527,7 @@ public class SurveyServerService {
 		Optional<Surveys> optionalSurvey = surveysRepository.findById(surveyId);
 		Surveys survey = optionalSurvey.get();
 		
-		List<SurveyHistory> surveyHistoryList = surveyHistoryRepository.findByIdSurveyIdAndQuestionOrderIs(surveyId, survey.getSumQuestions());
+		List<SurveyHistory> surveyHistoryList = surveyHistoryRepository.findByIdSurveyIdAndQuestionOrderIsNot(surveyId, 0);
 		
 		for (int index = 0; index < surveyHistoryList.size(); index++) {			
 			JsonObject result = new JsonObject();
@@ -544,6 +544,70 @@ public class SurveyServerService {
 		
 		res.addProperty("title", survey.getTitle());
 		res.add("resultList", resultList);
+		
+		return res.toString();
+	}
+	
+	/* 설문 결과 :: 결과 분석 데이터 가져오기 */
+	public String getSurveyResultAnalysis(@RequestParam Long surveyId) {
+		JsonObject res = new JsonObject();
+		JsonArray analysisList = new JsonArray();
+
+		List<Questions> questions = questionsRepository.findBySurveysId(surveyId);
+		for (int index = 0; index < questions.size(); index++) {
+			JsonObject obj = new JsonObject();
+			JsonObject datacollection = new JsonObject();
+			JsonArray labels = new JsonArray();
+			JsonArray datasets = new JsonArray();
+			JsonObject dataset = new JsonObject();
+			dataset.addProperty("label", "응답수");
+			dataset.addProperty("backgroundColor", "#FAE100");
+			dataset.addProperty("pointBackgroundColor", "white");
+			dataset.addProperty("borderWidth", 0);
+			dataset.addProperty("pointBorderColor", "249EBF");
+			
+			JsonArray data = new JsonArray();
+			
+			Questions question = questions.get(index);
+			
+			if (question.getType().equals("choice")) {
+				List<Options> options = optionsRepository.findByQuestionsIdOrderByOptionOrder(question.getId());
+				for (int second_index = 0; second_index < options.size(); second_index++) {
+					Options option = options.get(second_index);
+					labels.add(option.getOption());
+					
+					int count = answersRepository.findByQuestionsIdAndAnswerEquals(question.getId(), option.getOption()).size();
+					data.add(count);
+				}
+				
+				dataset.add("data", data);
+				datasets.add(dataset);
+				
+				datacollection.add("labels", labels);
+				datacollection.add("datasets", datasets);
+				
+				obj.addProperty("question", question.getDescription());
+				obj.addProperty("type", question.getType());
+				obj.add("datacollection", datacollection);
+				
+				analysisList.add(obj);
+			} else {
+				List<Answers> answers = answersRepository.findByQuestionsId(question.getId());
+				JsonArray answerList = new JsonArray();
+				
+				for (int second_index = 0; second_index < answers.size(); second_index++) {
+					answerList.add(answers.get(second_index).getAnswer());
+				}
+				
+				obj.addProperty("question", question.getDescription());
+				obj.addProperty("type", question.getType());
+				obj.add("datacollection", answerList);
+				
+				analysisList.add(obj);
+			}
+		}
+		
+		res.add("analysisList", analysisList);
 		
 		return res.toString();
 	}
@@ -583,7 +647,12 @@ public class SurveyServerService {
 				resultItem.addProperty("type", "choice");
 				resultItem.addProperty("question", questionTitle);
 				resultItem.add("options", options);
-				resultItem.addProperty("answer", answer.getAnswer());
+				
+				try {
+					resultItem.addProperty("answer", answer.getAnswer());
+				} catch (NullPointerException e) {
+					resultItem.addProperty("answer", "");
+				}
 				
 				result.add(resultItem);
 			} else {
@@ -591,7 +660,12 @@ public class SurveyServerService {
 				
 				resultItem.addProperty("type", "text");
 				resultItem.addProperty("question", questionTitle);
-				resultItem.addProperty("answer", answer.getAnswer());
+				
+				try {
+					resultItem.addProperty("answer", answer.getAnswer());
+				} catch (NullPointerException e) {
+					resultItem.addProperty("answer", "");
+				}
 				
 				result.add(resultItem);
 			}

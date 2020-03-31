@@ -16,5 +16,5 @@ public interface SurveyHistoryRepository extends JpaRepository<SurveyHistory, Su
 	@Query(value = "select * from survey_history where survey_id=:survey_id and question_order=:sum_questions", nativeQuery=true)
 	List<SurveyHistory> findHistory(@Param("survey_id") Long surveyId, @Param("sum_questions") int sumQuestions);
 	
-	List<SurveyHistory> findByIdSurveyIdAndQuestionOrderIs(Long surveyId, int sumQuestions);
+	List<SurveyHistory> findByIdSurveyIdAndQuestionOrderIsNot(Long surveyId, int sumQuestions);
 }
