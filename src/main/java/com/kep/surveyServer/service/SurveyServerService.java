@@ -114,6 +114,9 @@ public class SurveyServerService {
 			
 			info.addProperty("title", survey.getTitle());
 			info.addProperty("description", survey.getDescription());
+			info.addProperty("welcomeMsg", survey.getWelcomeMsg());
+			info.addProperty("completeMsg", survey.getCompleteMsg());
+			info.addProperty("status", survey.getStatus());
 			
 			res.addProperty("status", survey.getStatus());
 			res.addProperty("result", true);
@@ -127,15 +130,18 @@ public class SurveyServerService {
 		return res.toString();
 	}
 	
-	public String setSurveyInfo(Long surveyId, String title, String description) {
+	public String setSurveyInfo(Long surveyId, String title, String description, String welcomeMsg, String completeMsg) {
 		JsonObject res = new JsonObject();
 		
 		try {
 			Registers register = registerRepository.findById((long) 1).get();
 			
 			Surveys survey = surveysRepository.findByIdAndRegisters(surveyId, register).get();
+			
 			survey.setTitle(title);
 			survey.setDescription(description);
+			survey.setWelcomeMsg(welcomeMsg);
+			survey.setCompleteMsg(completeMsg);
 			
 			surveysRepository.save(survey);
 			
@@ -343,51 +349,51 @@ public class SurveyServerService {
 //	}	
 	
 	/* 설문 배포 :: 설문 상태 조회 */
-	public String getSurveyDeploy(@RequestParam Long surveyId) {
-		JsonObject res = new JsonObject();
-		
-		try {
-			Optional<Surveys> survey = surveysRepository.findById(surveyId);
-			Surveys entity = survey.get();
-			
-			res.addProperty("welcomeMsg", entity.getWelcomeMsg());
-			res.addProperty("completeMsg", entity.getCompleteMsg());
-			res.addProperty("status", entity.getStatus());
-		} catch (Exception e ) {
-			res.addProperty("result", "false");
-			res.addProperty("msg", "Message update failed");
-		}
-		
-		return res.toString();
-	}
-	
-	/* 설문 배포 :: 설문 환영/완료 메시지 저장 */
-	public String setSurveyMsg(String flag, Long surveyId, String welcomeMsg, String completeMsg) {
-		JsonObject res = new JsonObject();
-		
-		try {
-			Optional<Surveys> survey = surveysRepository.findById(surveyId); 
-			Surveys entity = survey.get();
-			
-			if (flag.equals("welcome")) {
-				entity.setWelcomeMsg(welcomeMsg);
-			} else if (flag.equals("complete")){
-				entity.setCompleteMsg(completeMsg);
-			} else {
-				throw new Exception();
-			}
-			
-			surveysRepository.save(entity);
-			
-			res.addProperty("result", "true");
-			res.addProperty("msg", "Message updated successfully");
-		} catch(Exception e) {
-			res.addProperty("result", "false");
-			res.addProperty("msg", "Message update failed");
-		}
-				
-		return res.toString();
-	}
+//	public String getSurveyDeploy(@RequestParam Long surveyId) {
+//		JsonObject res = new JsonObject();
+//		
+//		try {
+//			Optional<Surveys> survey = surveysRepository.findById(surveyId);
+//			Surveys entity = survey.get();
+//			
+//			res.addProperty("welcomeMsg", entity.getWelcomeMsg());
+//			res.addProperty("completeMsg", entity.getCompleteMsg());
+//			res.addProperty("status", entity.getStatus());
+//		} catch (Exception e ) {
+//			res.addProperty("result", "false");
+//			res.addProperty("msg", "Message update failed");
+//		}
+//		
+//		return res.toString();
+//	}
+//	
+//	/* 설문 배포 :: 설문 환영/완료 메시지 저장 */
+//	public String setSurveyMsg(String flag, Long surveyId, String welcomeMsg, String completeMsg) {
+//		JsonObject res = new JsonObject();
+//		
+//		try {
+//			Optional<Surveys> survey = surveysRepository.findById(surveyId); 
+//			Surveys entity = survey.get();
+//			
+//			if (flag.equals("welcome")) {
+//				entity.setWelcomeMsg(welcomeMsg);
+//			} else if (flag.equals("complete")){
+//				entity.setCompleteMsg(completeMsg);
+//			} else {
+//				throw new Exception();
+//			}
+//			
+//			surveysRepository.save(entity);
+//			
+//			res.addProperty("result", "true");
+//			res.addProperty("msg", "Message updated successfully");
+//		} catch(Exception e) {
+//			res.addProperty("result", "false");
+//			res.addProperty("msg", "Message update failed");
+//		}
+//				
+//		return res.toString();
+//	}
 	
 	/* 설문 배포 :: 설문 상태 관리 */
 	public String openSurvey(Long surveyId, int status) {

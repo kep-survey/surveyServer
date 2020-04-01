@@ -116,8 +116,11 @@ public class SurveyServerController {
 			Long surveyId = body.get("surveyId").asLong();
 			String title = body.get("title").asText();
 			String description = body.get("description").asText();
+			String welcomeMsg = body.get("welcomeMsg").asText();
+			String completeMsg = body.get("completeMsg").asText();
 			
-			return surveyServerService.setSurveyInfo(surveyId, title, description);
+			
+			return surveyServerService.setSurveyInfo(surveyId, title, description, welcomeMsg, completeMsg);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 			
@@ -130,45 +133,45 @@ public class SurveyServerController {
 	}
 	
 	/* 설문 배포 :: 설문 상태 조회 */
-	@GetMapping("/getSurveyDeploy")
-	public String getSurveyDeploy(@RequestParam Long surveyId) {
-		return surveyServerService.getSurveyDeploy(surveyId);
-	}
+//	@GetMapping("/getSurveyDeploy")
+//	public String getSurveyDeploy(@RequestParam Long surveyId) {
+//		return surveyServerService.getSurveyDeploy(surveyId);
+//	}
 	
 	/* 설문 배포 :: 설문 환영/완료 메시지 저장 */
-	@PostMapping("/setSurveyMsg")
-	public String setSurveyMsg(@RequestBody String req) {
-		ObjectMapper objectMapper = new ObjectMapper();
-		
-		try {
-			JsonNode body = objectMapper.readValue(req, JsonNode.class);
-			
-			String flag = body.get("flag").asText();
-			Long surveyId = body.get("surveyId").asLong();
-			String welcomeMsg, completeMsg;
-			
-			if (flag.equals("welcome")) {
-				welcomeMsg = body.get("welcomeMsg").asText();
-				completeMsg = "";
-			} else if (flag.equals("complete")){
-				welcomeMsg = "";
-				completeMsg = body.get("completeMsg").asText();
-			} else {
-				welcomeMsg = "";
-				completeMsg = "";
-			}
-			
-			return surveyServerService.setSurveyMsg(flag, surveyId, welcomeMsg, completeMsg);
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-			
-			JsonObject res = new JsonObject();
-			res.addProperty("result", "false");
-			res.addProperty("msg", "Json processing error occurred");
-			
-			return res.toString();
-		}
-	}
+//	@PostMapping("/setSurveyMsg")
+//	public String setSurveyMsg(@RequestBody String req) {
+//		ObjectMapper objectMapper = new ObjectMapper();
+//		
+//		try {
+//			JsonNode body = objectMapper.readValue(req, JsonNode.class);
+//			
+//			String flag = body.get("flag").asText();
+//			Long surveyId = body.get("surveyId").asLong();
+//			String welcomeMsg, completeMsg;
+//			
+//			if (flag.equals("welcome")) {
+//				welcomeMsg = body.get("welcomeMsg").asText();
+//				completeMsg = "";
+//			} else if (flag.equals("complete")){
+//				welcomeMsg = "";
+//				completeMsg = body.get("completeMsg").asText();
+//			} else {
+//				welcomeMsg = "";
+//				completeMsg = "";
+//			}
+//			
+//			return surveyServerService.setSurveyMsg(flag, surveyId, welcomeMsg, completeMsg);
+//		} catch (JsonProcessingException e) {
+//			e.printStackTrace();
+//			
+//			JsonObject res = new JsonObject();
+//			res.addProperty("result", "false");
+//			res.addProperty("msg", "Json processing error occurred");
+//			
+//			return res.toString();
+//		}
+//	}
 	
 	/* 설문 배포 :: 설문 상태 관리 */
 	@PostMapping("/openSurvey")
@@ -186,7 +189,7 @@ public class SurveyServerController {
 			e.printStackTrace();
 			
 			JsonObject res = new JsonObject();
-			res.addProperty("result", "false");
+			res.addProperty("result", "false"); 
 			res.addProperty("msg", "Json processing error occurred");
 			
 			return res.toString();
