@@ -567,8 +567,8 @@ public class SurveyServerService {
 			dataset.addProperty("pointBorderColor", "249EBF");
 			
 			JsonArray data = new JsonArray();
-			
 			Questions question = questions.get(index);
+			int sumAnswers = 0;
 			
 			if (question.getType().equals("choice")) {
 				List<Options> options = optionsRepository.findByQuestionsIdOrderByOptionOrder(question.getId());
@@ -578,6 +578,8 @@ public class SurveyServerService {
 					
 					int count = answersRepository.findByQuestionsIdAndAnswerEquals(question.getId(), option.getOption()).size();
 					data.add(count);
+					
+					sumAnswers += count;
 				}
 				
 				dataset.add("data", data);
@@ -586,6 +588,7 @@ public class SurveyServerService {
 				datacollection.add("labels", labels);
 				datacollection.add("datasets", datasets);
 				
+				obj.addProperty("sumAnswers", sumAnswers);
 				obj.addProperty("question", question.getDescription());
 				obj.addProperty("type", question.getType());
 				obj.add("datacollection", datacollection);
@@ -599,6 +602,7 @@ public class SurveyServerService {
 					answerList.add(answers.get(second_index).getAnswer());
 				}
 				
+				obj.addProperty("sumAnswers", answerList.size());
 				obj.addProperty("question", question.getDescription());
 				obj.addProperty("type", question.getType());
 				obj.add("datacollection", answerList);
