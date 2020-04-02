@@ -292,6 +292,10 @@ public class SurveyServerService {
 			// 설문 질문 일괄 삭제
 			questionsRepository.deleteBySurveys(survey);
 			
+			// 설문 수 업데이트
+			survey.setSumQuestions(questions.size());
+			surveysRepository.save(survey);
+			
 			// 데이터 저장하기
 			for(Questions question : questions) {
 				question.setId(null);
